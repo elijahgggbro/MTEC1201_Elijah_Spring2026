@@ -1,381 +1,231 @@
+ 
+ /* Comments at the top of your sketch, including:
+Elijah B
+Test of trust, patience, maybe bravery
 
-/*
-Elijah Brown
-
-Claw Machine Practice
-
-Use the left and right buttons to navigate towards the prizes. When ready, push the middle drop button to collect everything. 
-
-Press space to reset
-
-
-In terms of a theme, I simply thought it would be a fun practice to make a claw machine, as the claw is either stuck, or dropping 
-towards the prize. In the future, I would like to add swaying to the crane as it was moving.
+Rules are simple, do not click the button. Or do, it's up to you. 
 
 
 */
+ 
+ 
+ 
+ let buttonX 
+  let buttonY  
+  let buttonR 
 
-let clawX
-let clawY
-let drop = false
-let score= 0
 
-// prizes
+//  
+let buttonTimer1 = 0
+let ClickTimer1 = 0
 
-let prizeX1, prizeY1, prizeOn1, prizeSize1;
-let prizeX2, prizeY2, prizeOn2, prizeSize2;
+
+
+// Are you sure???? variables
+	let clicked = false
+	let confirmed = false
+	let confirmTimer = 0
+	let confirmDuration = 3000
+
+
+
+
+// REALLY SURE variables
+	let reallyConfirmed = false
+	let reallyConfirmTimer = 0
+	let reallyConfirmDuration = 3000
+
+
+
+// sets up the mistakes you've made
+	let youActuallyDidIt 
+	let showYouActuallyDidIt = false
+
+
+  	let didItAngle = 0
 
 
 function setup() {
-	createCanvas(700, 700);
-
-	clawX= width /2;
-	clawY= 100;
-
-
-
+	createCanvas(600, 600);
+	
 
 
 	
-	// prize setup
 
-	
-   //prize 1 value randomizer
-prizeX1 = random(100,600); prizeY1 = (535); prizeOn1 = true, prizeSize1 = random(15,40);
-
-	//prize 2 value randomizer
-prizeX2 = random(100,600); prizeY2 = (525); prizeOn2 = true, prizeSize2 = random(20,30);
-
-
-	
+	// button sensor dimensions
+   buttonX = width/2;
+   buttonY = 300;
+   buttonR = 200
 }
+
+
+// load image
+function preload() {
+	
+	youActuallyDidIt = loadImage('cat.jpg')
+
+}
+
+
+
+
 
 function draw() {
+	background(255);
 
-
-	background(100);
-
-
-
-
-
-
-// machine border
-
-	// top
-	fill(256,0,0);
-	rect(0,0,700,90);
-
-
-	// sides
-	fill(200);
-	rect(0,0,50,700);
-
-	rect(650,0,50,700);
-
-	// bottom
-
-	fill(256,0,0);
-	rect(0,550,700,150);
+	fill(0);
+	textSize(40);
+	textAlign(CENTER);
+	text("do NOT press the button!",width/2,50);
 
 
 
 
 
+  if(!showYouActuallyDidIt){     // only shows button if it isnt the last scene
 
 
 
-// prize generation 
+
+	let buttonHover = dist(mouseX, mouseY, buttonX, buttonY) < buttonR; 
+
+	// button sensor logic
+
 	
-   // prize 1
-if(prizeOn1 === true){
-	fill(100,256,256);
-	noStroke();
-	ellipse(prizeX1,prizeY1,prizeSize1,prizeSize1);
-	
-}
 
+	if (mouseIsPressed && buttonHover) {
+		
+		fill (220,0,0);  // clicked
+		
+	} else if (buttonHover){
 
-	//prize 2
-if(prizeOn2 === true){
-	fill(256,256,100);
-	noStroke();
-	rect(prizeX2,prizeY2,prizeSize2,prizeSize2);
 	
+		fill(255,100,0);  // hovered
+		
+	} else{
+		
+		fill (255,0,0);  // start
+		
 }
 
 
 
+	// draw button
+	
+
+	circle(buttonX, buttonY, buttonR * 2);
 
 
+	// button is clicked,,,,, do you REALLY want to do this?
+	  if (clicked && !confirmed) {
+		  
 
-	//////////// prize logic
-			 //c hecks if claw is within prize
+		// milliseconds since first click timer
+		  let elapsed = millis() - confirmTimer
+	
 
+		  // 3 seconds passed , confirm
 
-	  // prize 1
-	if (drop && prizeOn1 && dist(clawX, clawY + 130, prizeX1, prizeY1)
-		< prizeSize1 / 2 + 10) {
-
+	 if (elapsed > 3000) {
+		 
+	      confirmed = true
 
 		
-    prizeOn1 = false;
+		// shows are you sure? text after clicked 
+    } else {
 		
-    score = score + 1;
+      fill(0);
+		textSize(40);
+      text("are you sure?", buttonX, buttonY)
 		
-    drop = false;
+    }
+
+
+
+
+
+
+
+		  
   }
- 
-  	     // prize 2 
-  if (drop && prizeOn2 && dist(clawX, clawY + 130, prizeX2, prizeY2) < prizeSize2 / 2 + 10) {
-    prizeOn2 = false;
-    score = score + 1;
-    drop = false;
+// 
+
+        // Really sure? confirmation timer logic
+	  if (confirmed && !reallyConfirmed && reallyConfirmTimer >0) {
+		  
+	    let elapsed = millis() - reallyConfirmTimer
+
+    if (elapsed > reallyConfirmDuration) {
+		
+	     reallyConfirmed = true
+		
+    } else {
+	
+	   // are you REALLY sure text
+
+      fill(0)
+      textSize(40)
+      text("are you REALLY sure???", buttonX, buttonY)
+
+		
+    }
   }
 
 
 
 
 
+}else {
 
 
-	
-// Press spacee to restart
+	// generates image / translation logic
+	didItAngle += 0.05;
+	translate(width/2, height/2);
+	rotate(didItAngle);
 
-	//if both prizes are won, display congradulation text
-if (prizeOn1 === false && prizeOn2 === false) {
-
-  fill(255, 220, 0);
-  textSize(20);
-  textAlign(CENTER);
-  text("YOU WIN! Congratulations! Press Space to Play Again", width / 2, 300);
+	// image
+	imageMode(CENTER);
+	image(youActuallyDidIt, width / 2 - 200, height / 2 - 150, 400, 400)
 }
 
 
-
-
-
-
-	
-
-////// DROP BUTTON LOGIC
-	// if button pressed, drop
-if (drop === true) {
-
-	
-  clawY = clawY + 4;
-
-	
-} else {
-
-	
-  clawY = 100;
-}
-
-	// if hits object/ floor, go back up
-
-	
-if (clawY > 430) {
-
-	
-  drop = false;
-
-	
-}
-
-
-
-
-
-	
-
-	
-
-// claw  functions
-
-
-	// claw rope
-	stroke(0);
-	line (clawX,clawY+100,clawX,90);
-
-
-	
-	//	claw
-
-	line (clawX ,clawY  + 100, clawX - 20, clawY + 120);
-	
-	line (clawX ,clawY  + 100, clawX + 20, clawY + 120);
-
-
-
-	//  hook arms
-
-	
-	line (clawX +10 ,clawY  + 130, clawX + 23, clawY + 120);
-
-	line (clawX - 10,clawY  + 130, clawX - 23, clawY + 120);
-
-
-
-// left and right buttons//
-
-
-		 //leeft button
-
-	
-	
-	 if (mouseX > 150 && mouseX < 200 && mouseY > 625 &&
-		 mouseY < 675 && mouseIsPressed) {
-
-		 
-	fill(255);  // clicked
-		 
-		
-  } else if (mouseX > 150 && mouseX < 200 &&
-			   mouseY > 625 && mouseY < 675) {
-		 
-    fill(256, 200, 0);  // hovered
-		 
-  } else {
-		 
-    fill(255, 220, 0);  // normal
-		 
+// shows image after clicked
+if (showYouActuallyDidIt) {
+    image(youActuallyDidIt, width / 2 - 200, height / 2 - 150, 400, 400)
   }
-  triangle(200, 625, 200, 675, 150, 650);
+
+}
 
 
 
 
+// mouse pressed
 
-	// right 
-	
-	if (mouseX > 500 && mouseX < 550 && mouseY > 625 && 
-		mouseY < 675 && mouseIsPressed) {
+function mousePressed() {
 
+	// button radius logic
+	let buttonHover = dist(mouseX, mouseY, buttonX, buttonY) < buttonR;  
+								
+	if (buttonHover && !confirmed) {
 		
-    fill(255);          // clicked
+		clicked = true
+		confirmTimer = millis()
 
-		
-  } else if (mouseX > 500 && mouseX < 550 &&
-			 mouseY > 625 && mouseY < 675) {
-
-		
-    fill(256, 200, 0);  // hovered
-
-		
-  } else {
-		
-    fill(255, 220, 0);  // normal
-		
   }
-  triangle(500, 625, 500, 675, 550, 650); 
-
-
-
-
-
-
-// Claw drop button
-
-	
-
-	if(dist(mouseX,mouseY,width/2, 650 ) < 30 && mouseIsPressed){
-		 
+  // begins timer for " are you really sure????"
+	if (buttonHover && confirmed && !reallyConfirmed) {
 		
-		fill(256);  // clicked
-
+	    reallyConfirmTimer = millis()
 		
-	} else if(dist(mouseX,mouseY,width/2, 650) < 30){
-	
-	  
-		 fill(256, 200, 0)	// hovered
-	
-	}  else {
-		fill(255,220,0);  // normal
+}
+//   show image after everything else set up
+	if (buttonHover && reallyConfirmed && !showYouActuallyDidIt) {
+		
+	    showYouActuallyDidIt = true
+
 	}
 
-circle(width /2, 650,60); 
-
-
-
-	
-
 }
 
 
 
-
-
-
-
-/// button reactions
-
-function mousePressed(){
-
-
-   // senses where mouse is in relation to button
-
-  if (mouseX > 150 && mouseX < 200 && mouseY > 625 && mouseY < 675) {
-    clawX = clawX - 20;
-  }
-  if (mouseX > 500 && mouseX < 550 && mouseY > 625 && mouseY < 675) {
-    clawX = clawX + 20;
-  }
-  if (dist(mouseX, mouseY, width / 2, 650) < 30) {
-    drop = true;
-  
-
-  }
-
-	
-	// constrains claw within walls of machine 
-
-
-	clawX = constrain(clawX,70,630)
-}
-
-
-
-
-
-
-
-//// pressing space resets game
-
-function keyPressed() {
-	
-  if (key === ' ') {
-
-	  
-    // reset claw
-
-	  
-    clawX = width / 2;
-    clawY = 100;
-    drop = false;
-    score = 0;
-
-	  
-
-    // reset prizes 
-
-    // prize 1
-
-  
-    prizeX1 = random(100, 600);
-    prizeY1 = 535;
-    prizeSize1 = random(15, 40);
-    prizeOn1 = true;
-
-    // prize 2
-
-	   prizeX2 = random(100, 600);
-    prizeY2 = 525;
-    prizeSize2 = random(20, 30);
-    prizeOn2 = true;
-
-
-
-	  
-  }
-}
